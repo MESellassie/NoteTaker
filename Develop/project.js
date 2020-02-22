@@ -16,3 +16,36 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "Develop/public")));
 
+// api call for the notes that sends the data to the browser as an array
+app.get("/api/notes", function(err, res){
+    try {
+        notePad = fs.readFileSync("Develop/db/db.json");
+        console.log("alert");
+        notePad = JSON.parse(notePad);
+    } catch(err) {
+        console.log(err);
+    }
+    res.json(notePad);
+});
+
+app.post("/api/notes", function(req, res) {
+    try {
+        notePad = fs.readFileSync("Develop/db/db.json");
+        console.log(notePad);
+        // Used to ensure we get an array
+        notePad = JSON.parse(notePad);
+        // setting what is required of the user
+        req.body.id = notePad.length;
+        notePad.push(req.body);
+        // return the data to a string
+        notePad = JSON.stringify(notePad);
+        fs.writeFile("./Develop/db/db.json", notePad, function(err) {
+        if (err) throw err;
+        });
+        res.json(JSON.parse(notePad));
+
+    } catch(err) {
+        throw err;
+    }
+    
+});
